@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import javax.sql.rowset.RowSetFactory;
+
 public class HandleRequest implements Runnable {
   private Socket socket;
   private Server server;
@@ -30,25 +32,23 @@ public class HandleRequest implements Runnable {
       Request current_request = this.server.getHttpRequest();
       String route =
           current_request.getMethod() + " " + current_request.getURL();
-      boolean routeExists = this.server.mathRoute(route);
+      boolean routeExists = this.server.matchRoute(route);
       if (!routeExists) {
         String response = "HTTP/1.1 404 Not Found\r\n\r\n";
         this.socket.getOutputStream().write(response.getBytes("UTF-8"));
         this.socket.getOutputStream().flush();
         this.socket.close();
-      } else {
-        String response = "HTTP/1.1 200 OK\r\n"
-                          + "Content-Type: text/plain\r\n"
-                          + "Content-Length: 13\r\n"
-                          + "\r\n"
-                          + "Hello, world!";
-        this.socket.getOutputStream().write(response.getBytes("UTF-8"));
+      }
+        Response response = this.server.getHttpResponse();
+        if ( response.getStatus() == "" ) {
+          response.setStatus("200 OK");
+        }
+        String clrf_response = response.toCLRF();
+        this.socket.getOutputStream().write(clrf_response.getBytes("UTF-8"));
         this.socket.getOutputStream().flush();
         this.socket.close();
-      }
-
     } catch (IOException e) {
-      System.err.println("Server error: " + e.getMessage());
+      System.err.println(e.getMessage());
     }
   }
 
