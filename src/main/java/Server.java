@@ -13,11 +13,13 @@ public class Server {
   private Request httpRequest;
   private HashMap<String, BiConsumer<Response, Request>> routes;
 
+
   public Server(int port) {
     this.port = port;
     this.httpResponse = new Response();
     this.httpRequest = new Request();
     this.routes = new HashMap<>();
+
   }
 
   public boolean matchRoute(String key) {
@@ -37,7 +39,7 @@ public class Server {
         this.getHttpRequest().setURLParams(params);
         
         var func = entry.getValue();
-        func.accept(this.httpResponse, this.httpRequest);
+        func.accept(this.getHttpResponse(), this.getHttpRequest());
         return true;
       }
     }

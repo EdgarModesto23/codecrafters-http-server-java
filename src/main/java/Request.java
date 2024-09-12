@@ -26,17 +26,26 @@ public class Request {
   private String URL;
   private String method;
   private LinkedList<String> wildcards;
+  private String filespath;
   private HashMap<String, String> URLParams;
 
   public Request() {
     this.headers = new HashMap<>();
     this.body = "";
     this.URL = "";
+    this.filespath = ".";
     this.method = "";
     this.wildcards = new LinkedList<>();
     this.URLParams = new HashMap<>();
   }
 
+  public String getFilespath() {
+      return filespath;
+  }
+
+  public void setFilespath(String filespath) {
+      this.filespath = filespath;
+  }
 
   public void addHeader(String key, String value) {
     this.headers.put(key, value);

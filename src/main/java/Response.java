@@ -14,6 +14,15 @@ public class Response {
     this.contentType = "text/plain";
   }
 
+
+  public void addHeader(String key, String value) {
+    this.headers.put(key, value);
+  }
+
+  public void setContentType(String value) {
+    this.contentType = value;
+  }
+
   public String GetHeader(String key) { return this.headers.get(key); }
 
   public String getStatus() { return status; }

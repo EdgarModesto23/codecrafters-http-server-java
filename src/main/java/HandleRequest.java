@@ -3,8 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-import javax.sql.rowset.RowSetFactory;
-
 public class HandleRequest implements Runnable {
   private Socket socket;
   private Server server;
@@ -28,7 +26,9 @@ public class HandleRequest implements Runnable {
         in.read(body, 0, contentLength);
         request.append("\r\n").append(new String(body));
       }
+      String filespath = this.server.getHttpRequest().getFilespath();
       this.server.setHttpRequest(request.toString());
+      this.server.getHttpRequest().setFilespath(filespath);
       Request current_request = this.server.getHttpRequest();
       String route =
           current_request.getMethod() + " " + current_request.getURL();
