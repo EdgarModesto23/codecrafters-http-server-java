@@ -47,6 +47,7 @@ public class HandleRequest implements Runnable {
       if (current_request.GetHeader("Accept-Encoding") != null) {
         if (current_request.GetHeader("Accept-Encoding").contains("gzip")) {
           response.addHeader("Content-Encoding", "gzip");
+          this.server.getHttpResponse().compressBody();
         }
       }
       String clrf_response = response.toCLRF();

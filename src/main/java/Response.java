@@ -1,5 +1,10 @@
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 public class Response {
   private HashMap<String, String> headers;
@@ -14,14 +19,11 @@ public class Response {
     this.contentType = "text/plain";
   }
 
-
   public void addHeader(String key, String value) {
     this.headers.put(key, value);
   }
 
-  public void setContentType(String value) {
-    this.contentType = value;
-  }
+  public void setContentType(String value) { this.contentType = value; }
 
   public String GetHeader(String key) { return this.headers.get(key); }
 
@@ -46,6 +48,20 @@ public class Response {
     }
 
     return result.toString();
+  }
+
+  public void compressBody() {
+    try {
+    ByteArrayOutputStream obj=new ByteArrayOutputStream();
+    GZIPOutputStream gzip = new GZIPOutputStream(obj);
+    gzip.write(this.body.getBytes());
+    gzip.close();
+    String compressedBody = Base64.getEncoder().encodeToString(obj.toByteArray());
+    this.setBody(compressedBody);
+    } catch (IOException e) {
+      System.out.println(e);
+    }
+
   }
 
   public void setHeaders(HashMap<String, String> headers) {
