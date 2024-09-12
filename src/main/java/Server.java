@@ -13,13 +13,11 @@ public class Server {
   private Request httpRequest;
   private HashMap<String, BiConsumer<Response, Request>> routes;
 
-
   public Server(int port) {
     this.port = port;
     this.httpResponse = new Response();
     this.httpRequest = new Request();
     this.routes = new HashMap<>();
-
   }
 
   public boolean matchRoute(String key) {
@@ -27,17 +25,19 @@ public class Server {
     for (Map.Entry<String, BiConsumer<Response, Request>> entry :
          this.routes.entrySet()) {
       String routePath = entry.getKey();
-      Pattern pattern = Pattern.compile("^" + routePath.replaceAll(":([a-zA-Z0-9]+)", "([^/]+)") + "$");
+      Pattern pattern = Pattern.compile(
+          "^" + routePath.replaceAll(":([a-zA-Z0-9]+)", "([^/]+)") + "$");
       Matcher matcher = pattern.matcher(key);
       if (matcher.matches()) {
         this.getHttpRequest().setURLParams(new HashMap<>());
         // Extract values for named groups
         HashMap<String, String> params = new HashMap<>();
-                for (int i = 1; i <= matcher.groupCount(); i++) {
-                    params.put(routePath.substring(matcher.start(i) + 1), matcher.group(i));
-                }
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+          params.put(routePath.substring(matcher.start(i) + 1),
+                     matcher.group(i));
+        }
         this.getHttpRequest().setURLParams(params);
-        
+
         var func = entry.getValue();
         func.accept(this.getHttpResponse(), this.getHttpRequest());
         return true;
@@ -83,7 +83,6 @@ public class Server {
     this.httpRequest = parseHttpRequest(request);
   }
 
-  
   public static Request insertHeaders(Request request, String headersString) {
     String[] headersSplit = headersString.split("\r\n");
     Request newRequest = request;
@@ -94,20 +93,22 @@ public class Server {
     return newRequest;
   }
 
-
   public static Request parseHttpRequest(String request) {
     Request newRequest = new Request();
     int methodOffset =
         newRequest.getCharacterUntilWhitespace(request, new SetMethod());
-    newRequest.getCharacterUntilWhitespace(
-        request.substring(methodOffset + 1), new SetPath());
+    newRequest.getCharacterUntilWhitespace(request.substring(methodOffset + 1),
+                                           new SetPath());
     int headersOffset = request.indexOf("\n");
     if (request.indexOf("\r\n\r\n") < 0) {
       String headers = request.substring(headersOffset);
       newRequest = insertHeaders(newRequest, headers);
     } else {
-      String headers = request.substring(headersOffset, request.indexOf("\r\n\r\n"));
+      String headers =
+          request.substring(headersOffset, request.indexOf("\r\n\r\n"));
       newRequest = insertHeaders(newRequest, headers);
+      String body = request.substring(request.indexOf("\r\n\r\n") + 4);
+      newRequest.setBody(body);
     }
 
     return newRequest;

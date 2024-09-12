@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,6 +31,21 @@ public class Main {
     }
   }
 
+  public static void postFile(Response response, Request request) {
+    try {
+      File file = new File(request.getFilespath() + "/" + request.getParam("file"));
+      file.createNewFile();
+      FileWriter writer = new FileWriter(file);
+      writer.write(request.GetBody());
+      writer.close();
+      response.setStatus("201 Created");
+    } catch (IOException e) {
+      response.setStatus("500 Internal Server Error");
+      response.setBody("Internal server error");
+      System.out.println(e);
+    }
+  }
+
   public static void main(String[] args) {
     Server server = new Server(4221);
 
@@ -46,6 +63,7 @@ public class Main {
         (response, request) -> addUserAgentToBody(response, request));
     server.registerRoute("GET /files/:file",
                          (response, request) -> sendFile(response, request));
+    server.registerRoute("POST /files/:file", (response,request) -> postFile(response,request));
 
     server.ListenAndServe();
   }
