@@ -20,6 +20,11 @@ public class Server {
     this.routes = new HashMap<>();
   }
 
+
+  public void setHttpResponse(Response httpResponse) {
+      this.httpResponse = httpResponse;
+  }
+
   public boolean matchRoute(String key) {
 
     for (Map.Entry<String, BiConsumer<Response, Request>> entry :

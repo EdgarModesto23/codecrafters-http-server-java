@@ -26,6 +26,7 @@ public class HandleRequest implements Runnable {
         in.read(body, 0, contentLength);
         request.append("\r\n").append(new String(body));
       }
+      this.server.setHttpResponse(new Response());
       String filespath = this.server.getHttpRequest().getFilespath();
       this.server.setHttpRequest(request.toString());
       this.server.getHttpRequest().setFilespath(filespath);
@@ -39,14 +40,19 @@ public class HandleRequest implements Runnable {
         this.socket.getOutputStream().flush();
         this.socket.close();
       }
-        Response response = this.server.getHttpResponse();
-        if ( response.getStatus() == "" ) {
-          response.setStatus("200 OK");
+      Response response = this.server.getHttpResponse();
+      if (response.getStatus() == "") {
+        response.setStatus("200 OK");
+      }
+      if (current_request.GetHeader("Accept-Encoding") != null) {
+        if (current_request.GetHeader("Accept-Encoding").contains("gzip")) {
+          response.addHeader("Content-Encoding", "gzip");
         }
-        String clrf_response = response.toCLRF();
-        this.socket.getOutputStream().write(clrf_response.getBytes("UTF-8"));
-        this.socket.getOutputStream().flush();
-        this.socket.close();
+      }
+      String clrf_response = response.toCLRF();
+      this.socket.getOutputStream().write(clrf_response.getBytes("UTF-8"));
+      this.socket.getOutputStream().flush();
+      this.socket.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
