@@ -1,4 +1,8 @@
 public class Main {
+  
+  public static void addUserAgentToBody(Response response, Request request) {
+    response.setBody(request.GetHeader("User-Agent"));
+  }
 
   public static void handleEmptyPath(Response response, Request request) {}
 
@@ -13,6 +17,7 @@ public class Main {
         "GET /", (response, request) -> handleEmptyPath(response, request));
     server.registerRoute(
         "GET /echo/:str", (response, request) -> handleWithWildCards(response, request));
+    server.registerRoute("GET /user-agent", (response, request) -> addUserAgentToBody(response, request));
 
 
     server.ListenAndServe();

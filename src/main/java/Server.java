@@ -78,16 +78,35 @@ public class Server {
   }
 
   public void setHttpRequest(String request) {
-    this.httpRequest = this.parseHttpRequest(request);
+    this.httpRequest = parseHttpRequest(request);
   }
 
-  public Request parseHttpRequest(String request) {
+  
+  public static Request insertHeaders(Request request, String headersString) {
+    String[] headersSplit = headersString.split("\r\n");
+    Request newRequest = request;
+    for (String header : headersSplit) {
+      String[] values = header.split(": ");
+      newRequest.addHeader(values[0], values[1]);
+    }
+    return newRequest;
+  }
+
+
+  public static Request parseHttpRequest(String request) {
     Request newRequest = new Request();
-    int method_offset =
+    int methodOffset =
         newRequest.getCharacterUntilWhitespace(request, new SetMethod());
-    int path_offset = newRequest.getCharacterUntilWhitespace(
-        request.substring(method_offset + 1), new SetPath());
-    int headers_offset = request.indexOf("\n");
+    newRequest.getCharacterUntilWhitespace(
+        request.substring(methodOffset + 1), new SetPath());
+    int headersOffset = request.indexOf("\n");
+    if (request.indexOf("\r\n\r\n") < 0) {
+      String headers = request.substring(headersOffset);
+      newRequest = insertHeaders(newRequest, headers);
+    } else {
+      String headers = request.substring(headersOffset, request.indexOf("\r\n\r\n"));
+      newRequest = insertHeaders(newRequest, headers);
+    }
 
     return newRequest;
   }

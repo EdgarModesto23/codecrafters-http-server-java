@@ -37,6 +37,11 @@ public class Request {
     this.URLParams = new HashMap<>();
   }
 
+
+  public void addHeader(String key, String value) {
+    this.headers.put(key, value);
+  }
+
   public void setWildCard(String val) { this.wildcards.add(val); }
 
   public LinkedList<String> getWildcards() { return wildcards; }
@@ -52,11 +57,8 @@ public class Request {
   public String getURL() { return URL; }
 
   public String getParam(String key) { return this.URLParams.get(key); }
-  
-  public HashMap<String, String> getParams() {
-    return this.URLParams;
-  }
 
+  public HashMap<String, String> getParams() { return this.URLParams; }
 
   public void setHeaders(HashMap<String, String> headers) {
     this.headers = headers;

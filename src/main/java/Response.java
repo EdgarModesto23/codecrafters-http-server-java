@@ -32,7 +32,8 @@ public class Response {
     }
     result.append(String.format("Content-Type: %s\r\n", this.contentType));
     if (this.body.length() > 0) {
-      result.append(String.format("Content-Length: %s\r\n", this.body.length()));
+      result.append(
+          String.format("Content-Length: %s\r\n", this.body.length()));
     }
 
     return result.toString();
