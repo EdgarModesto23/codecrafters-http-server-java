@@ -100,6 +100,9 @@ public class Server {
 
   public static Request parseHttpRequest(String request) {
     Request newRequest = new Request();
+    if (request.length() < 1) {
+      return newRequest;
+    }
     int methodOffset =
         newRequest.getCharacterUntilWhitespace(request, new SetMethod());
     newRequest.getCharacterUntilWhitespace(request.substring(methodOffset + 1),

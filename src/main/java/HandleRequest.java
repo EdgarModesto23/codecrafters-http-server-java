@@ -47,7 +47,16 @@ public class HandleRequest implements Runnable {
       if (current_request.GetHeader("Accept-Encoding") != null) {
         if (current_request.GetHeader("Accept-Encoding").contains("gzip")) {
           response.addHeader("Content-Encoding", "gzip");
-          this.server.getHttpResponse().compressBody();
+          byte[] compressedBody = this.server.getHttpResponse().compressBody();
+          this.server.getHttpResponse().addHeader(
+              "Content-Length", String.valueOf(compressedBody.length));
+          this.server.getHttpResponse().setBody("");
+          String clrf_response = response.toCLRF();
+          this.socket.getOutputStream().write(clrf_response.getBytes("UTF-8"));
+          this.socket.getOutputStream().write(compressedBody);
+          this.socket.getOutputStream().flush();
+          this.socket.close();
+          return;
         }
       }
       String clrf_response = response.toCLRF();

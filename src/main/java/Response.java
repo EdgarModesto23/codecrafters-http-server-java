@@ -42,7 +42,7 @@ public class Response {
           .append("\r\n"); // Append CRLF after each key-value pair
     }
     result.append(String.format("Content-Type: %s\r\n", this.contentType));
-    if (this.body.length() > 0) {
+    if (this.body.length() > 0 || this.GetHeader("Content-Length") != null) {
       result.append(
           String.format("Content-Length: %s\r\n", this.body.length()));
     }
@@ -50,18 +50,18 @@ public class Response {
     return result.toString();
   }
 
-  public void compressBody() {
+  public byte[] compressBody() {
+    byte[] compressedBody = {};
     try {
     ByteArrayOutputStream obj=new ByteArrayOutputStream();
     GZIPOutputStream gzip = new GZIPOutputStream(obj);
-    gzip.write(this.body.getBytes());
+    gzip.write(this.getBody().getBytes("UTF-8"));
     gzip.close();
-    String compressedBody = Base64.getEncoder().encodeToString(obj.toByteArray());
-    this.setBody(compressedBody);
+    compressedBody = obj.toByteArray();
     } catch (IOException e) {
       System.out.println(e);
     }
-
+    return compressedBody;
   }
 
   public void setHeaders(HashMap<String, String> headers) {
