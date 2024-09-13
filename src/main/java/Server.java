@@ -20,9 +20,8 @@ public class Server {
     this.routes = new HashMap<>();
   }
 
-
   public void setHttpResponse(Response httpResponse) {
-      this.httpResponse = httpResponse;
+    this.httpResponse = httpResponse;
   }
 
   public boolean matchRoute(String key) {
@@ -30,19 +29,8 @@ public class Server {
     for (Map.Entry<String, BiConsumer<Response, Request>> entry :
          this.routes.entrySet()) {
       String routePath = entry.getKey();
-      Pattern pattern = Pattern.compile(
-          "^" + routePath.replaceAll(":([a-zA-Z0-9]+)", "([^/]+)") + "$");
-      Matcher matcher = pattern.matcher(key);
-      if (matcher.matches()) {
-        this.getHttpRequest().setURLParams(new HashMap<>());
-        // Extract values for named groups
-        HashMap<String, String> params = new HashMap<>();
-        for (int i = 1; i <= matcher.groupCount(); i++) {
-          params.put(routePath.substring(matcher.start(i) + 1),
-                     matcher.group(i));
-        }
-        this.getHttpRequest().setURLParams(params);
-
+      this.getHttpRequest().setURLParams(new HashMap<>());
+      if (Util.comparePattern(routePath, key, this.getHttpRequest())) {
         var func = entry.getValue();
         func.accept(this.getHttpResponse(), this.getHttpRequest());
         return true;
